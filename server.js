@@ -21,7 +21,7 @@ let dataObj = {
 // })
 // /////////////////
 const getLocation = (request, response) => {
-    dataObj.locationURL = `https://us1.locationiq.com/v1/search.php?key=${GEO_APIKEY}&q=${city}&format=json&limit=1`;
+    dataObj.locationURL = `https://us1.locationiq.com/v1/search.php?key=${GEO_APIKEY}&q=${request.query.city}&format=json&limit=1`;
     requestAgent.get(dataObj.locationURL).then(locationData => {
         const data = locationData.body[0];
         response.status(200).json(new Location(request.query.city, data.display_name, data.lat, data.lon));
