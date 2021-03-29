@@ -9,24 +9,25 @@ require('dotenv').config();
 const PORT = process.env.PORT || 3001;
 const GEO_APIKEY = process.env.GEO_APIKEY;
 const WEA_APIKEY = process.env.WEA_APIKEY;
+const PARK_APIKEY = process.env.PARK_APIKEY;
 let dataObj = {
     locationURL: '',
     weatherURL: ''
 }
 // //////////////////
-// const a = `https://us1.locationiq.com/v1/search.php?key=pk.4a07986b38c10f2ca031c8625e6b4405&q=seattle&format=json&limit=1`;
-// requestAgent.get(a).then(data => {
-//     console.log(data.body[0]);
-//     // response.status(200).send('good');
-// })
-// /////////////////
+// const url ='https://developer.nps.gov/api/v1/parks?parkCode=acad&api_key=' + PARK_APIKEY;
+// console.log(url);
+//     requestAgent.get(url).then(locationData => {
+//         const mdata = locationData.total;
+//         console.log(mdata);
+//     })
+// // /////////////////
 const getLocation = (request, response) => {
-    dataObj.locationURL = `https://us1.locationiq.com/v1/search.php?key=${GEO_APIKEY}&q=${request.query.city}&format=json&limit=1`;
+    dataObj.locationURL = 'https://us1.locationiq.com/v1/search.php?key='+ GEO_APIKEY +'&q='+ request.query.city + '&format=json&limit=1';
     requestAgent.get(dataObj.locationURL).then(locationData => {
         const data = locationData.body[0];
-        response.status(200).json(new Location(request.query.city, data.display_name, data.lat, data.lon));
+        response.status(200).send(new Location(request.query.city, data.display_name, data.lat, data.lon));
     })
-
 }
 const getWeather = (request, response) => {
 
