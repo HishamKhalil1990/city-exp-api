@@ -1,10 +1,11 @@
 'use strict'
 const express = require('express');
-const cors = require('cors');
 const requestAgent = require('superagent');
 const { request, response } = require('express');
 const app = express();
-app.use(cors);
+const cors = require('cors');
+app.use(cors());
+require('dotenv').config();
 const PORT = process.env.PORT || 3001;
 const GEO_APIKEY = process.env.GEO_APIKEY;
 const WEA_APIKEY = process.env.WEA_APIKEY;
