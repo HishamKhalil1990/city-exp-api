@@ -44,7 +44,8 @@ const getPark = (request, response) => {
             const fee = data.entranceFees[0].cost;
             const description = data.description;
             const parkUtl = data.url;
-            response.status(200).json(new Park(name, address, fee, description, parkUtl));
+            const dataArr = [new Park(name, address, fee, description, parkUtl)];
+            response.status(200).json(dataArr);
         })
     }catch(error){
         response.status(404).send('it is not found');
