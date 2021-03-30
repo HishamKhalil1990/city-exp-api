@@ -21,12 +21,17 @@ const getLocation = (request, response) => {
         response.status(404).send('it is not found');
     }
 }
-const getWeather = (request, response) => {
-    console.log(request.query);
+const getWeather = async (request, response) => {
     try{
-        const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=Raleigh,NC&key=API_KEY`
+        const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
+        const weatherData = await requestAgent.get(url)
+        const parseWeartherData = JSON.parse(weatherData.text).data;
+        const neededData = parseWeartherData.map(a=>{
+            return new Weather(a.weather.description,a.datetime)
+        })
+        response.status(200).send(neededData);
     }catch(error){
-
+        response.status(404).send('it is not found');
     }
 }
 const getPark = (request, response) => {
