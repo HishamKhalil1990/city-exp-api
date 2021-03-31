@@ -55,8 +55,15 @@ const getLocation = (request, response) => {
     })
 }
 const getWeather = async (request, response) => {
+    let values = Object.keys(request.query);
+    let url;
+    console.log(values)
+    if (values[0] == "search_query"){
+        url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
+    }else{
+        url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.name}&key=${WEATHER_API_KEY}`
+    }
     try{
-        const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
         const weatherData = await requestAgent.get(url)
         const parseWeartherData = JSON.parse(weatherData.text).data;
         const neededData = parseWeartherData.map(a=>{
