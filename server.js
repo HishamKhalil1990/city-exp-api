@@ -6,6 +6,7 @@ const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const PARKS_API_KEY = process.env.PARKS_API_KEY;
 const DATABASE_URL = process.env.DATABASE_URL;
+const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
 const NODE_ENV = process.env.NODE_ENV;
 // libraries declerations
 const express = require('express');
@@ -93,10 +94,29 @@ const getPark = (request, response) => {
 
 }
 const getMovies = (request,response) => {
-
+    try{
+        const url = `https://api.themoviedb.org/3/movie/550?api_key=${MOVIE_API_KEY}`
+        requestAgent.get(url).then(moviesData=>{
+            const parsedData = JSON.parse(moviesData.text);
+            const title = parsedData.original_title;
+            const overview = parsedData.overview;
+            const average_votes = parsedData.vote_average;
+            const total_votes = parsedData.vote_count;
+            const image_url = `https://image.tmdb.org/t/p/w500${parsedData.poster_path}`;
+            const popularity = parsedData.popularity;
+            const released_on = parsedData.release_date;
+            response.json(new Movies(title, overview, average_votes, total_votes, image_url, popularity, released_on))
+        })
+    }catch(error){
+        response.status(404).send('it is not found');
+    }
 }
 const getYelp = (request,response) => {
-
+    try{
+        const city = request.query.search_query;
+    }catch(error){
+        
+    }
 }
 // creating request middlewares
 app.get('/location', getLocation);
@@ -122,7 +142,12 @@ function Park(name, address, fee, description, url) {
     this.description = description,
     this.url = url;
 }
-function Error() {
-    this.status = 500;
-    this.responseText = "Sorry, something went wrong";
+function Movies(title, overview, average_votes, total_votes, image_url, popularity, released_on){
+    this.title = title;
+    this.overview = overview;
+    this.average_votes = average_votes;
+    this.total_votes = total_votes;
+    this.image_url = image_url;
+    this.popularity = popularity;
+    this.released_on = released_on;
 }
