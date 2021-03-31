@@ -105,7 +105,7 @@ const getMovies = (request,response) => {
             const image_url = `https://image.tmdb.org/t/p/w500${parsedData.poster_path}`;
             const popularity = parsedData.popularity;
             const released_on = parsedData.release_date;
-            response.json(new Movies(title, overview, average_votes, total_votes, image_url, popularity, released_on))
+            response.json([new Movies(title, overview, average_votes, total_votes, image_url, popularity, released_on)])
         })
     }catch(error){
         response.status(404).send('it is not found');
