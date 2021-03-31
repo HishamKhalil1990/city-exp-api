@@ -29,12 +29,10 @@ client.connect().then( () => {
 // creating request middlewares handler functions
 const getLocation = (request, response) => {
     const city = request.query.city;
-    console.log(city);
     // get the city saved data
     const selectSql = 'SELECT * FROM locationTable WHERE name = $1';
     client.query(selectSql,[city]).then(citySavedData =>{
-        console.log(citySavedData);
-        if(citySavedData.rowCount == 0 && city !== null){
+        if(citySavedData.rowCount == 0){
             try{
                 // city is not listed in the table
                 const url = 'https://us1.locationiq.com/v1/search.php?key=' + GEOCODE_API_KEY + '&q=' + city + '&format=json&limit=1';
@@ -52,13 +50,20 @@ const getLocation = (request, response) => {
                 response.status(404).send('it is not found');
             }
         }else{
-            response.status(200).json(citySavedData.rows[0]);
+            response.status(200).json(new Location(citySavedData.rows[0].name, citySavedData.rows[0].location, citySavedData.rows[0].latitude, citySavedData.rows[0].longitude));
         }
     })
 }
 const getWeather = async (request, response) => {
+    let values = Object.keys(request.query);
+    let url;
+    console.log(values)
+    if (values[0] == "search_query"){
+        url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
+    }else{
+        url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.name}&key=${WEATHER_API_KEY}`
+    }
     try{
-        const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
         const weatherData = await requestAgent.get(url)
         const parseWeartherData = JSON.parse(weatherData.text).data;
         const neededData = parseWeartherData.map(a=>{
