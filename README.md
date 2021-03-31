@@ -1,55 +1,24 @@
-# city-exp-api   and   sql2
-
+# city-exp-api  
 **Author**: Hisham Khalil
-**Version**: 1.8.3
+**Version**: 2.1.1
 
 ## Overview
 ### The application is for exploring cities around the world for knowing thier locations and thier weather 
 
 ## Getting Started
-### they should use node.js and install all needed tools 
+### they should use node.js, API and psql and install all needed tools 
 
 ## Architecture
-### the app. design consists of the node-module libraries, json-packeges and the server.js which is written in JavaScript.
+### the app. design consists of the node-module libraries, json-packeges, PSQL and the server.js which is written in JavaScript.
 
 ## Change Log
-Number and name of feature:  Repository Set Up
+Number and name of feature:  SQl setup for location
 
-Estimate of time needed to complete: 30 min
+Estimate of time needed to complete: 4 hr
 
-Start time: 2:30 pm
+Start time: 7:30 pm - 10:30 pm
 
-Finish time: 3 pm
-
-Actual time needed to complete: 30 min
-
-Number and name of feature: Locations functionalty
-
-Estimate of time needed to complete: 2 hr
-
-Start time: 3:15 pm
-
-Finish time: 5:40 pm 
-
-Actual time needed to complete: 2 hr 25 min
-
-Number and name of feature:  weather functionalty
-
-Estimate of time needed to complete: 3 hr
-
-Start time: 3 pm
-
-Finish time: 6 pm
-
-Actual time needed to complete: 3 hr (from the next day)
-
-Number and name of feature: parks functionalty
-
-Estimate of time needed to complete: 3 hr
-
-Start time: 7 pm
-
-Finish time: 12:30 am
+Finish time: 3:00 pm 5:30 pm
 
 Actual time needed to complete: 5 hr 30 min
 
