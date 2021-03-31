@@ -12,6 +12,7 @@ const express = require('express');
 const requestAgent = require('superagent');
 const cors = require('cors');
 const pg = require('pg');
+const { request, response } = require('express');
 // creating the application
 const app = express();
 // app middleware setups
@@ -57,7 +58,6 @@ const getLocation = (request, response) => {
 const getWeather = async (request, response) => {
     let values = Object.keys(request.query);
     let url;
-    console.log(values)
     if (values[0] == "search_query"){
         url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
     }else{
@@ -92,10 +92,18 @@ const getPark = (request, response) => {
     }
 
 }
+const getMovies = (request,response) => {
+
+}
+const getYelp = (request,response) => {
+
+}
 // creating request middlewares
 app.get('/location', getLocation);
 app.get('/weather', getWeather);
 app.get('/parks', getPark);
+app.get('/movies',getMovies);
+app.get('yelp',getYelp);
 // creating function constructors
 function Location(name, location, latitude, longitude) {
     this.search_query = name;
