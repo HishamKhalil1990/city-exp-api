@@ -7,6 +7,7 @@ const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const PARKS_API_KEY = process.env.PARKS_API_KEY;
 const DATABASE_URL = process.env.DATABASE_URL;
 const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
+const YELP_API_KEY = process.env.YELP_API_KEY;
 const NODE_ENV = process.env.NODE_ENV;
 // libraries declerations
 const express = require('express');
@@ -113,7 +114,10 @@ const getMovies = (request,response) => {
 }
 const getYelp = (request,response) => {
     try{
-        const city = request.query.search_query;
+        const url = `https://api.yelp.com/v3/businesses/search/phone`
+        requestAgent.get(url).auth('my_token', { type: 'Bearer ' + YELP_API_KEY }).then(data=>{
+            console.log(data);
+        })
     }catch(error){
         
     }
