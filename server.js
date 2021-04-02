@@ -7,6 +7,7 @@ const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 const PARKS_API_KEY = process.env.PARKS_API_KEY;
 const DATABASE_URL = process.env.DATABASE_URL;
 const MOVIE_API_KEY = process.env.MOVIE_API_KEY;
+const YELP_API_KEY = process.env.YELP_API_KEY;
 const NODE_ENV = process.env.NODE_ENV;
 // libraries declerations
 const express = require('express');
@@ -57,13 +58,8 @@ const getLocation = (request, response) => {
     })
 }
 const getWeather = async (request, response) => {
-    let values = Object.keys(request.query);
-    let url;
-    if (values[0] == "search_query"){
-        url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.search_query}&key=${WEATHER_API_KEY}`
-    }else{
-        url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${request.query.name}&key=${WEATHER_API_KEY}`
-    }
+    const city = request.query.search_query;
+    let url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&key=${WEATHER_API_KEY}`;
     try{
         const weatherData = await requestAgent.get(url)
         const parseWeartherData = JSON.parse(weatherData.text).data;
@@ -76,46 +72,75 @@ const getWeather = async (request, response) => {
     }
 }
 const getPark = (request, response) => {
+    const city = request.query.search_query;
     try{
-        const url = 'https://developer.nps.gov/api/v1/parks?parkCode=acad&api_key=' + PARKS_API_KEY;
+        const url = `https://developer.nps.gov/api/v1/parks?q=${city}&api_key=${PARKS_API_KEY}`;
         requestAgent.get(url).then(parksData => {
-            const data = parksData.body.data[0];
-            const name = data.fullName;
-            const address = data.addresses[0].line1 + data.addresses[0].city;
-            const fee = data.entranceFees[0].cost;
-            const description = data.description;
-            const parkUtl = data.url;
-            const dataArr = [new Park(name, address, fee, description, parkUtl)];
+            const dataArr = parksData.body.data;
+            dataArr.map(data=>{
+                const name = data.fullName;
+                const address = data.addresses[0].line1 + data.addresses[0].city;
+                const fee = data.entranceFees[0].cost;
+                const description = data.description;
+                const parkUtl = data.url;
+                return new Park(name, address, fee, description, parkUtl);
+            })
             response.status(200).json(dataArr);
         })
     }catch(error){
         response.status(404).send('it is not found');
     }
-
 }
 const getMovies = (request,response) => {
+    const city = request.query.search_query;
+    const queryParams ={
+        query : city,
+        api_key:MOVIE_API_KEY
+    }
     try{
-        const url = `https://api.themoviedb.org/3/movie/550?api_key=${MOVIE_API_KEY}`
-        requestAgent.get(url).then(moviesData=>{
-            const parsedData = JSON.parse(moviesData.text);
-            const title = parsedData.original_title;
-            const overview = parsedData.overview;
-            const average_votes = parsedData.vote_average;
-            const total_votes = parsedData.vote_count;
-            const image_url = `https://image.tmdb.org/t/p/w500${parsedData.poster_path}`;
-            const popularity = parsedData.popularity;
-            const released_on = parsedData.release_date;
-            response.status(200).json([new Movies(title, overview, average_votes, total_votes, image_url, popularity, released_on)])
+        const url = 'https://api.themoviedb.org/3/movie/top_rated'
+        requestAgent.get(url,queryParams).then(moviesData=>{
+            const data = moviesData.body.results;
+            const dataArr = []
+            for(let i = 0; i < 5; i++){
+                const title = data[i].title;
+                const overview = data[i].overview;
+                const average_votes = data[i].vote_average;
+                const total_votes = data[i].vote_count;
+                const image_url = `https://image.tmdb.org/t/p/w500${data[i].backdrop_path}`;
+                const popularity = data[i].popularity;
+                const released_on = data[i].release_date;
+                dataArr.push(new Movies(title, overview, average_votes, total_votes, image_url, popularity, released_on))
+            }
+            response.status(200).json(dataArr)
         })
     }catch(error){
         response.status(404).send('it is not found');
     }
 }
 const getYelp = (request,response) => {
+    const city = request.query.search_query;
+    const url = 'https://api.yelp.com/v3/businesses/search';
+    const queryParams ={
+        location : city,
+        term : 'restaurants'
+    }
     try{
-        const city = request.query.search_query;
+        requestAgent.get(url, queryParams).set('Authorization',`Bearer ${YELP_API_KEY }`).then(data=>{
+            const text = data.body;
+            const dataArr = []
+            for(let i = 0; i < 5; i++){
+                const name = text.businesses[i].name;
+                const image_url = text.businesses[i].image_url;
+                const price = text.businesses[i].price;
+                const rating = text.businesses[i].rating;
+                const res_url = text.businesses[i].url;
+                dataArr.push(new Yelp(name,image_url,price,rating,res_url))
+            }
+            response.status(200).json(dataArr)
+        })
     }catch(error){
-        
+        response.status(404).send('it is not found');
     }
 }
 // creating request middlewares
@@ -123,7 +148,7 @@ app.get('/location', getLocation);
 app.get('/weather', getWeather);
 app.get('/parks', getPark);
 app.get('/movies',getMovies);
-app.get('yelp',getYelp);
+app.get('/yelp',getYelp);
 // creating function constructors
 function Location(name, location, latitude, longitude) {
     this.search_query = name;
@@ -150,4 +175,11 @@ function Movies(title, overview, average_votes, total_votes, image_url, populari
     this.image_url = image_url;
     this.popularity = popularity;
     this.released_on = released_on;
+}
+function Yelp(name,image_url,price,rating,res_url){
+    this.name = name,
+    this.image_url = image_url,
+    this.price = price,
+    this.rating = rating,
+    this.url = res_url
 }
